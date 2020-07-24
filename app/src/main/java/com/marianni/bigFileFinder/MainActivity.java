@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,12 +26,7 @@ import com.codekidlabs.storagechooser.StorageChooser;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -79,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
             listView = (ListView) findViewById(R.id.listview);
-            //listView.setMinimumHeight(100);
             Button startButton = findViewById(R.id.button);
             Button resetButton = findViewById(R.id.reset);
 
@@ -164,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     nBiggestFiles = 1;
                 }
-                fileList.addAll(getNBiggestFiles(new File(path), nBiggestFiles));
+                BigFileFinder bigFileFinder = new BigFileFinder();
+                fileList.addAll(bigFileFinder.getNBiggestFiles(new File(path), nBiggestFiles));
             }
         });
 
@@ -220,52 +214,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void findFilesRecursive(File file, List<FileWithSize> list){
-        if (file.isDirectory()) {
-            List<File> files = Arrays.asList(file.listFiles());
-            for(File dirFile : files){
-                findFilesRecursive(dirFile, list);
-            }
-        } else {
-            list.add(new FileWithSize(file.getAbsolutePath(), file.length()));
-        }
-    }
 
-    public List<String> getNBiggestFiles(File dir, Integer n){
-        List<FileWithSize> allFiles = initializeFileSet(dir);
-        Collections.sort(allFiles, new FileWithSizeComparator());
 
-        List<String> nBiggestFiles = new ArrayList<>();
-
-        int index = 0;
-        for (FileWithSize file : allFiles){
-            index++;
-            if (index > n){
-                break;
-            }
-            BigDecimal kilobytes = new BigDecimal(file.getSizeInBytes()).divide(new BigDecimal(1024));
-            BigDecimal megabytes = kilobytes.divide(new BigDecimal(1024));
-
-            String format = String.format("%s | %s KB | %s MB", file.getPath(),kilobytes.setScale(2, RoundingMode.HALF_UP), megabytes.setScale(2, RoundingMode.HALF_UP));
-            nBiggestFiles.add(format);
-        }
-        return nBiggestFiles;
-    }
-
-    public List<FileWithSize> initializeFileSet(File dir){
-        List<FileWithSize> list = new ArrayList<>();
-        findFilesRecursive(dir, list);
-        return list;
-    }
-
-    private static class FileWithSizeComparator implements Comparator<FileWithSize>{
-        @Override
-        public int compare(FileWithSize a, FileWithSize b) {
-            return b.getSizeInBytes().compareTo(a.getSizeInBytes());
-        }
-    };
-
-    // Creating Runtime permission function.
+    /**
+     * Creating Runtime permission function.
+     */
     public void AndroidRuntimePermission(){
 
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
