@@ -9,9 +9,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * @author mariannarachelova
+ */
 public class BigFileFinder {
-
-
 
     public List<String> getNBiggestFiles(File dir, Integer n){
         List<FileWithSize> allFiles = initializeFileList(dir);
@@ -57,6 +58,4 @@ public class BigFileFinder {
             return b.getSizeInBytes().compareTo(a.getSizeInBytes());
         }
     }
-
-
 }
